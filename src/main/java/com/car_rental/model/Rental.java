@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+import com.car_rental.exception.InvalidDataException;
 import com.car_rental.util.RentalUtil;
 
 public class Rental {
@@ -17,21 +18,27 @@ public class Rental {
     }
 
     public Rental(Car car, Customer customer, String startDate, String endDate){
-        this.car = car;
+        setCar(car);
         this.customer = customer;
         setStartDate(startDate);
         setEndDate(endDate);
+        if(this.endDate.isBefore(this.startDate)){
+            throw new InvalidDataException("End date cannot be before start date");
+        }
     }
 
     public Rental(Car car, Customer customer){
-        this.car = car;
+        setCar(car);
         this.customer = customer;
         this.startDate = LocalDate.now();
         this.endDate = LocalDate.now().plusDays(10);
     }
 
     public void setCar(Car car){
+        RentalUtil.validateCar(car);
+        car.setStatus(CarStatus.RESERVED);
         this.car = car;
+
     }
 
     public Car getCar(){
@@ -47,10 +54,9 @@ public class Rental {
     }
 
     public void setStartDate(String startDate){
-        if (RentalUtil.isValidDateFormat(startDate)){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-            this.startDate = LocalDate.parse(startDate, formatter);
-        }
+        RentalUtil.ValidateDateFormat(startDate);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        this.startDate = LocalDate.parse(startDate, formatter);
     }
 
     public LocalDate getStartDate(){
@@ -58,10 +64,9 @@ public class Rental {
     }
 
     public void setEndDate(String endDate){
-        if (RentalUtil.isValidDateFormat(endDate)){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-            this.endDate = LocalDate.parse(endDate, formatter);
-        }
+        RentalUtil.ValidateDateFormat(endDate);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        this.endDate = LocalDate.parse(endDate, formatter);
     }
 
     public LocalDate getEndDate(){
@@ -69,10 +74,7 @@ public class Rental {
     }
 
     public static Rental createRental(Car car, Customer customer, String startDate, String endDate){
-        if (RentalUtil.isValidDateFormat(startDate) && RentalUtil.isValidDateFormat(endDate)){
-            return new Rental(car, customer, startDate, endDate);
-        }
-        return null;
+        return new Rental(car, customer, startDate, endDate);
     }
 
     public static Rental createRental(Car car, Customer customer){
@@ -81,7 +83,7 @@ public class Rental {
 
     @Override
     public String toString(){
-        return String.format("Rental{Car=%s, Customer=%s, startDate=%s, endDate=%s}",
+        return String.format("Rental[Car=%s, Customer=%s, startDate=%s, endDate=%s]",
              car, customer, startDate, endDate);
     }
 

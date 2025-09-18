@@ -4,31 +4,35 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-import com.car_rental.util.CustomerUtil;
 import com.car_rental.util.PaymentUtil;
 
 public class Payment {
     private Rental rental;
     private double amount;
     private LocalDate paymentDate;
+    private PaymentMethod paymentMethod;
 
     public Payment() {
 
     }
 
-    public Payment(Rental rental, double amount, String paymentDate){
-        this.rental = rental;
+    public Payment(Rental rental, double amount, String paymentDate, PaymentMethod paymentMethod) {
+        setRental(rental);
+        rental.getCar().setStatus(CarStatus.RENTED);
         setAmount(amount);
         setPaymentDate(paymentDate);
+        this.paymentMethod = paymentMethod;
     }
 
-    public Payment(Rental rental, double amount){
-        this.rental = rental;
+    public Payment(Rental rental, double amount, PaymentMethod paymentMethod) {
+        setRental(rental);
         setAmount(amount);
         this.paymentDate = LocalDate.now();
+        this.paymentMethod = paymentMethod;
     }
 
     public void setRental(Rental rental){
+        rental.getCar().setStatus(CarStatus.RENTED);
         this.rental = rental;
     }
 
@@ -37,9 +41,8 @@ public class Payment {
     }
 
     public void setAmount(double amount){
-        if(PaymentUtil.isValidAmount(amount)){
-            this.amount = amount;
-        }
+        PaymentUtil.validateAmount(amount);
+        this.amount = amount;
     }
 
     public double getAmount(){
@@ -47,33 +50,34 @@ public class Payment {
     }
 
     public void setPaymentDate(String paymentDate){
-        if (CustomerUtil.isValidDateFormat(paymentDate)){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-            this.paymentDate = LocalDate.parse(paymentDate, formatter);
-        }
+        PaymentUtil.validateDateFormat(paymentDate);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        this.paymentDate = LocalDate.parse(paymentDate, formatter);
     }
 
     public LocalDate getPaymentDate(){
         return paymentDate;
     }
 
-    public Payment createPayment(Rental rental, double amount, String paymentDate){
-        if(PaymentUtil.isValidAmount(amount) && PaymentUtil.isValidDateFormat(paymentDate)){
-            return new Payment(rental, amount, paymentDate);
-        }
-        return null;
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
-    public Payment createPayment(Rental rental, double amount){
-        if(PaymentUtil.isValidAmount(amount)){
-            return new Payment(rental, amount);
-        }
-        return null;
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public Payment createPayment(Rental rental, double amount, String paymentDate, PaymentMethod paymentMethod){
+        return new Payment(rental, amount, paymentDate, paymentMethod);
+    }
+
+    public Payment createPayment(Rental rental, double amount, PaymentMethod paymentMethod){
+        return new Payment(rental, amount, paymentMethod);
     }
 
     @Override
     public String toString(){
-        return String.format("Payment{rental=%s, amount=%.2f, paymentDate=%s}",
+        return String.format("Payment[rental=%s, amount=%.2f, paymentDate=%s]",
              rental, amount, paymentDate);
     }
 
@@ -91,7 +95,6 @@ public class Payment {
     public int hashCode() {
         return Objects.hash(rental, amount, paymentDate);
     }
-
 
 
 }

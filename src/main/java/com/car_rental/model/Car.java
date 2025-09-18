@@ -9,9 +9,18 @@ public class Car {
     private String model;
     private int year;
     private double mileage;
+    private CarStatus status;
 
     public Car(){
 
+    }
+
+    public Car(String licensePlate, String model, int year, double mileage, CarStatus status){
+        setModel(model);
+        setLicensePlate(licensePlate);
+        setYear(year);
+        setMileage(mileage);
+        this.status = status;
     }
 
     public Car(String licensePlate, String model, int year, double mileage){
@@ -19,13 +28,12 @@ public class Car {
         setModel(model);
         setYear(year);
         setMileage(mileage);
+        this.status = CarStatus.AVAILABLE;
     }
 
     public void setLicensePlate(String licensePlate){
-        licensePlate = licensePlate.trim().toUpperCase();
-        if (CarUtil.isValidLicensePlate(licensePlate)){
-            this.licensePlate = licensePlate;
-        }
+        CarUtil.validateLicensePlate(licensePlate);
+        this.licensePlate = licensePlate;
     }
 
     public String getLicensePlate(){
@@ -33,9 +41,8 @@ public class Car {
     }
 
     public void setModel(String model){
-        if (CarUtil.isValidModel(model)){
-            this.model = model;
-        }
+        CarUtil.validateModel(model);
+        this.model = model;
     }
 
     public String getModel(){
@@ -43,9 +50,8 @@ public class Car {
     }
 
     public void setYear(int year){
-        if(CarUtil.isValidYear(year)){
-            this.year = year;
-        }
+        CarUtil.validateYear(year);
+        this.year = year;
     }
 
     public int getYear(){
@@ -53,27 +59,34 @@ public class Car {
     }
 
     public void setMileage(double mileage){
-        if(CarUtil.isValidMileage(mileage)){
-            this.mileage = mileage;
-        }
+        CarUtil.validateMileage(mileage);
+        this.mileage = mileage;
     }
 
     public double getMileage(){
         return mileage;
     }
 
-    public static Car createCar(String licensePlate, String model, int year, double mileage){
-        if (CarUtil.isValidLicensePlate(licensePlate) && CarUtil.isValidModel(model)
-            && CarUtil.isValidYear(year) && CarUtil.isValidMileage(mileage)){
-                return new Car(licensePlate, model, year, mileage);
-            }
+    public void setStatus(CarStatus status) {
+        this.status = status;
+    }
 
-        return null;
+    public CarStatus getStatus() {
+        return status;
+    }
+
+    public static Car createCar(String licensePlate, String model, int year, double mileage, CarStatus status){
+        return new Car(licensePlate, model, year, mileage, status);
+    }
+
+    public static Car createCar(String licensePlate, String model, int year, double mileage){
+        return new Car(licensePlate, model, year, mileage, CarStatus.AVAILABLE);
+        
     }
 
     @Override
     public String toString(){
-        return String.format("Car{licensePlate=%s, model=%s, year=%d, mileage=%.1f}",
+        return String.format("Car[licensePlate=%s, model=%s, year=%d, mileage=%.1f]",
              licensePlate, model, year, mileage);
     }
 
