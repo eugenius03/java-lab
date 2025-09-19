@@ -24,11 +24,26 @@ public class Payment {
         this.paymentMethod = paymentMethod;
     }
 
+    public Payment(Rental rental, double amount, String paymentDate, String paymentMethod) {
+        setRental(rental);
+        rental.getCar().setStatus(CarStatus.RENTED);
+        setAmount(amount);
+        setPaymentDate(paymentDate);
+        this.paymentMethod = PaymentMethod.parsePaymentMethod(paymentMethod);
+    }
+
     public Payment(Rental rental, double amount, PaymentMethod paymentMethod) {
         setRental(rental);
         setAmount(amount);
         this.paymentDate = LocalDate.now();
         this.paymentMethod = paymentMethod;
+    }
+
+    public Payment(Rental rental, double amount, String paymentMethod) {
+        setRental(rental);
+        setAmount(amount);
+        this.paymentDate = LocalDate.now();
+        this.paymentMethod = PaymentMethod.parsePaymentMethod(paymentMethod);
     }
 
     public void setRental(Rental rental){
@@ -71,7 +86,15 @@ public class Payment {
         return new Payment(rental, amount, paymentDate, paymentMethod);
     }
 
+    public Payment createPayment(Rental rental, double amount, String paymentDate, String paymentMethod){
+        return new Payment(rental, amount, paymentDate, paymentMethod);
+    }
+
     public Payment createPayment(Rental rental, double amount, PaymentMethod paymentMethod){
+        return new Payment(rental, amount, paymentMethod);
+    }
+
+    public Payment createPayment(Rental rental, double amount, String paymentMethod){
         return new Payment(rental, amount, paymentMethod);
     }
 

@@ -31,6 +31,14 @@ public class Car {
         this.status = CarStatus.AVAILABLE;
     }
 
+    public Car(String licensePlate, String model, int year, double mileage, String status){
+        setLicensePlate(licensePlate);
+        setModel(model);
+        setYear(year);
+        setMileage(mileage);
+        this.status = CarStatus.parseCarStatus(status);
+    }
+
     public void setLicensePlate(String licensePlate){
         CarUtil.validateLicensePlate(licensePlate);
         this.licensePlate = licensePlate;
@@ -81,7 +89,10 @@ public class Car {
 
     public static Car createCar(String licensePlate, String model, int year, double mileage){
         return new Car(licensePlate, model, year, mileage, CarStatus.AVAILABLE);
-        
+    }
+
+    public static Car createCar(String licensePlate, String model, int year, double mileage, String status){
+        return new Car(licensePlate, model, year, mileage, status);
     }
 
     @Override

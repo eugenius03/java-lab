@@ -15,7 +15,7 @@ public class Main {
             new Car("EF5678GH", "Ford Focus",   2016, 55000, CarStatus.AVAILABLE),
             new Car("IJ9012KL", "Hyundai i30",  2021, 15000, CarStatus.MAINTENANCE)
         };
-        
+        System.out.println(CarStatus.parseCarStatus("avaILabl"));
         Customer cust1 = new Customer("Olena", "Shevchenko", "ХЕН123456", "12.05.1992");
         Customer cust2 = new Customer("Nikita", "Kovalenko", "ХНВ123456", "03.11.1988");
 
