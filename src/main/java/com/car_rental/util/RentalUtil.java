@@ -1,5 +1,6 @@
 package com.car_rental.util;
 
+import com.car_rental.exception.InvalidDataException;
 import com.car_rental.model.Car;
 import com.car_rental.model.CarStatus;
 
@@ -11,13 +12,13 @@ public class RentalUtil {
 
     public static void ValidateDateFormat(String date){
         if(!isValidDateFormat(date)){
-            throw new IllegalArgumentException("Invalid date format. Expected format: dd.MM.yyyy, but got " + date);
+            throw new InvalidDataException("Invalid date format. Expected format: dd.MM.yyyy, but got " + date);
         }
     }
 
     public static void validateCar(Car car){
         if(car.getStatus() != CarStatus.AVAILABLE){
-            throw new IllegalArgumentException("Car is not available for rental");
+            throw new InvalidDataException("Car is not available for rental");
         }
     }
 }

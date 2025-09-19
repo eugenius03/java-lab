@@ -1,10 +1,12 @@
 package com.car_rental.util;
 
+import com.car_rental.exception.InvalidDataException;
+
 public class CustomerUtil {
 
     public static void validateName(String name){
         if(!ValidationHelper.isStringLengthBetween(name, 1, 30)){
-            throw new IllegalArgumentException("Invalid customer name");
+            throw new InvalidDataException("Invalid customer name, must be between 1 and 30 characters");
         }
     }
 

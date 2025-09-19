@@ -1,5 +1,7 @@
 package com.car_rental.util;
 
+import com.car_rental.exception.InvalidDataException;
+
 public class PaymentUtil {
     
     public static boolean isValidAmount(double amount){
@@ -8,7 +10,7 @@ public class PaymentUtil {
 
     public static void validateAmount(double amount){
         if(!isValidAmount(amount)){
-            throw new IllegalArgumentException("Invalid amount, must be non-negative");
+            throw new InvalidDataException("Invalid amount, must be non-negative");
         }
     }
 
@@ -18,7 +20,7 @@ public class PaymentUtil {
 
     public static void validateDateFormat(String date){
         if(!isValidDateFormat(date)){
-            throw new IllegalArgumentException("Invalid date format. Expected format: dd.MM.yyyy, but got " + date);
+            throw new InvalidDataException("Invalid date format. Expected format: dd.MM.yyyy, but got " + date);
         }
     }
 }

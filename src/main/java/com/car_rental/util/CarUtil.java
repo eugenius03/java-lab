@@ -2,6 +2,8 @@ package com.car_rental.util;
 
 import java.time.LocalDate;
 
+import com.car_rental.exception.InvalidDataException;
+
 public class CarUtil {
 
     public static boolean isValidLicensePlate(String licensePlate){
@@ -16,7 +18,7 @@ public class CarUtil {
 
     public static void validateLicensePlate(String licensePlate){
         if(!isValidLicensePlate(licensePlate)){
-            throw new IllegalArgumentException("Invalid license plate. Expected format: XX1234XX or custom 3-8 chars, but got " + licensePlate);
+            throw new InvalidDataException("Invalid license plate. Expected format: XX1234XX or custom 3-8 chars, but got " + licensePlate);
         }
     }
 
@@ -26,7 +28,7 @@ public class CarUtil {
 
     public static void validateModel(String model){
         if(!isValidModel(model)){
-            throw new IllegalArgumentException("Invalid model name, expected length between 5 and 100 characters");
+            throw new InvalidDataException("Invalid model name, expected length between 5 and 100 characters");
         }
     }
     
@@ -36,7 +38,7 @@ public class CarUtil {
 
     public static void validateYear(int year){
         if(!isValidYear(year)){
-            throw new IllegalArgumentException("Invalid year, expected between " + (LocalDate.now().getYear()-40) + " and " + LocalDate.now().getYear());
+            throw new InvalidDataException("Invalid year, expected between " + (LocalDate.now().getYear()-40) + " and " + LocalDate.now().getYear());
         }
     }
 
@@ -46,7 +48,7 @@ public class CarUtil {
 
     public static void validateMileage(double mileage){
         if(!isValidMileage(mileage)){
-            throw new IllegalArgumentException("Invalid mileage, must be non-negative");
+            throw new InvalidDataException("Invalid mileage, must be non-negative");
         }
     }
 }
