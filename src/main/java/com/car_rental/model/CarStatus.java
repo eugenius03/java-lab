@@ -1,7 +1,7 @@
 package com.car_rental.model;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.car_rental.exception.InvalidDataException;
 
@@ -12,7 +12,7 @@ public enum CarStatus {
     RESERVED(false);
 
     private boolean isAvailable;
-    private static final Logger logger = Logger.getLogger(CarStatus.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(CarStatus.class);
     
     CarStatus(boolean isAvailable) {
         this.isAvailable = isAvailable;
@@ -27,18 +27,18 @@ public enum CarStatus {
     }
 
     public static CarStatus parseCarStatus(String status){
-        logger.log(Level.INFO, "Trying to parse from {0}", status);
+        logger.info( "Trying to parse from {}", status);
         
         if (status == null){
-            logger.log(Level.WARNING, "Attempted to parse from null String");
+            logger.warn("Attempted to parse from null String");
             throw new InvalidDataException("CarStatus can't be null");
         }
         try {
             CarStatus result = CarStatus.valueOf(status.trim().toUpperCase());
-            logger.log(Level.INFO, "Successfully parsed CarStatus {0}", result);
+            logger.info("Successfully parsed CarStatus {}", result);
             return result;
         } catch (IllegalArgumentException e) {
-            logger.log(Level.SEVERE, "Failed to parse CarStatus, {0} is invalid", status);
+            logger.error( "Failed to parse CarStatus, {} is invalid", status);
             throw new InvalidDataException("Invalid CarStatus: '" + status + "'. Should be one of: " +
                 java.util.Arrays.toString(CarStatus.values()) + ", but got: " + status);
         }
