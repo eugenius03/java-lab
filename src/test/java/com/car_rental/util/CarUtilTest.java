@@ -2,6 +2,7 @@ package com.car_rental.util;
 
 import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -69,9 +70,11 @@ public class CarUtilTest {
     @Test
     @DisplayName("Should return true for valid years")
     void testIsValidYear() {
-        assertTrue(CarUtil.isValidYear(LocalDate.now().getYear() - 40));
-        assertTrue(CarUtil.isValidYear(LocalDate.now().getYear()));
-        assertTrue(CarUtil.isValidYear(LocalDate.now().getYear() - 20));
+        assertAll(
+            () -> assertTrue(CarUtil.isValidYear(LocalDate.now().getYear() - 40)),
+            () -> assertTrue(CarUtil.isValidYear(LocalDate.now().getYear())),
+            () -> assertTrue(CarUtil.isValidYear(LocalDate.now().getYear() - 20))
+        );
     }
 
     @Test
@@ -84,28 +87,36 @@ public class CarUtilTest {
     @Test
     @DisplayName("validateLicensePlate throws for invalid plates")
     void testValidateLicensePlate() {
-        assertThrows(InvalidDataException.class, () -> CarUtil.validateLicensePlate("toolongplate"));
-        assertDoesNotThrow(() -> CarUtil.validateLicensePlate("КА8838ЕН"));
+        assertAll(
+            () -> assertThrows(InvalidDataException.class, () -> CarUtil.validateLicensePlate("toolongplate")),
+            () -> assertDoesNotThrow(() -> CarUtil.validateLicensePlate("КА8838ЕН"))
+        );
     }
 
     @Test
     @DisplayName("validateMileage throws for negative values")
     void testValidateMileage() {
-        assertThrows(InvalidDataException.class, () -> CarUtil.validateMileage(-1.0));
-        assertDoesNotThrow(() -> CarUtil.validateMileage(0));
+        assertAll(
+        () -> assertThrows(InvalidDataException.class, () -> CarUtil.validateMileage(-1.0)),
+        () -> assertDoesNotThrow(() -> CarUtil.validateMileage(0))
+        );
     }
 
     @Test
     @DisplayName("validateModel throws for invalid names")
     void testValidateModel() {
-        assertThrows(InvalidDataException.class, () -> CarUtil.validateModel(""));
-        assertDoesNotThrow(() -> CarUtil.validateModel("Toyota Corolla"));
+        assertAll(
+        () -> assertThrows(InvalidDataException.class, () -> CarUtil.validateModel("")),
+        () -> assertDoesNotThrow(() -> CarUtil.validateModel("Toyota Corolla"))
+        );
     }
 
     @Test
     @DisplayName("validateYear throws for invalid years")
     void testValidateYear() {
-        assertThrows(InvalidDataException.class, () -> CarUtil.validateYear(LocalDate.now().getYear() - 41));
-        assertDoesNotThrow(() -> CarUtil.validateYear(LocalDate.now().getYear()));
+        assertAll(
+        () -> assertThrows(InvalidDataException.class, () -> CarUtil.validateYear(LocalDate.now().getYear() - 41)),
+        () -> assertDoesNotThrow(() -> CarUtil.validateYear(LocalDate.now().getYear()))
+        );
     }
 }

@@ -48,7 +48,7 @@ public class CarFileParser {
         try{
             List<String> lines = Files.readAllLines(path, Charset.forName("windows-1251"));
 
-            for(int i = 0; i< lines.size(); i++){
+            for(int i = 0; i < lines.size(); i++){
                 String line = lines.get(i);
                 if (line.isEmpty() || line.startsWith("#")) continue;
 
