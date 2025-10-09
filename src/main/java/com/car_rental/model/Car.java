@@ -1,10 +1,11 @@
 package com.car_rental.model;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import com.car_rental.util.CarUtil;
 
-public class Car {
+public class Car implements Comparable<Car> {
     private String licensePlate;
     private String model;
     private int year;
@@ -37,6 +38,28 @@ public class Car {
         setYear(year);
         setMileage(mileage);
         this.status = CarStatus.parseCarStatus(status);
+    }
+
+    @Override
+    public int compareTo(Car other){
+        return Integer.compare(this.getStatusPriority(), other.getStatusPriority());
+    }
+
+    private int getStatusPriority() {
+        return switch (status) {
+            case AVAILABLE -> 1;
+            case RESERVED -> 2;
+            case RENTED -> 3;
+            case MAINTENANCE -> 4;
+        };
+    }
+
+    public static Comparator<Car> byLicensePlate() {
+        return Comparator.comparing(Car::getLicensePlate);
+    }
+
+    public static Comparator<Car> byYear() {
+        return Comparator.comparing(Car::getYear);
     }
 
     public void setLicensePlate(String licensePlate){
