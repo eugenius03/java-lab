@@ -294,9 +294,9 @@ class GenericCarRepositoryTest {
     @DisplayName("sortByDefault should sort cars by status priority (natural ordering)")
     void testSortByDefaultValidCars() {
         carRepository.add(new Car("СЕ0303СХ", "Toyota", 2020, 50000, CarStatus.RENTED));
-        carRepository.add(new Car("СЕ0304СХ", "Honda", 2021, 30000, CarStatus.AVAILABLE));
-        carRepository.add(new Car("СЕ0305СХ", "Ford", 2019, 80000, CarStatus.MAINTENANCE));
-        carRepository.add(new Car("СЕ0305СХ", "BMW", 2022, 10000, CarStatus.RESERVED));
+        carRepository.add(new Car("СЕ0304СХ", "Honda 123", 2021, 30000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0305СХ", "Ford Mustang", 2019, 80000, CarStatus.MAINTENANCE));
+        carRepository.add(new Car("СЕ0306СХ", "BMW X7", 2022, 10000, CarStatus.RESERVED));
         
         List<Car> sorted = carRepository.sortByDefault();
         
@@ -343,7 +343,7 @@ class GenericCarRepositoryTest {
     void testSortByComparatorValid() {
         carRepository.add(new Car("СЕ0303СХ", "Honda", 2021, 30000, CarStatus.AVAILABLE));
         carRepository.add(new Car("СЕ0304СХ", "Toyota", 2020, 50000, CarStatus.AVAILABLE));
-        carRepository.add(new Car("СЕ0305СХ", "Ford", 2022, 10000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0305СХ", "Ford Mustang", 2022, 10000, CarStatus.AVAILABLE));
         
         List<Car> sortedByYear = carRepository.sortByComparator(Car.byYear().reversed());
         
@@ -367,8 +367,8 @@ class GenericCarRepositoryTest {
         
         List<Car> byMileage = carRepository.sortByComparator(Car.byMileage());
 
-        assertEquals(50000, byMileage.get(0).getMileage(), 0.001);
-        assertEquals(30000, byMileage.get(1).getMileage(), 0.001);
+        assertEquals(30000, byMileage.get(0).getMileage(), 0.001);
+        assertEquals(50000, byMileage.get(1).getMileage(), 0.001);
     }
 
     @Test
@@ -384,8 +384,8 @@ class GenericCarRepositoryTest {
     @ValueSource(strings = {"asc", "ASC", "ascending", "ASCENDING", "Asc", "Ascending"})
     @DisplayName("sortByIdentity should handle various ascending formats")
     void testSortByIdentityAscendingVariations(String order) {
-        carRepository.add(new Car("СЕ0303СХ", "BMW", 2022, 5000, CarStatus.AVAILABLE));
-        carRepository.add(new Car("СЕ0304СХ", "Audi", 2020, 80000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0303СХ", "BMW X7", 2022, 5000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0304СХ", "Audi RS6", 2020, 80000, CarStatus.AVAILABLE));
         
         List<Car> sorted = carRepository.sortByIdentity(order);
         
@@ -397,8 +397,8 @@ class GenericCarRepositoryTest {
     @ValueSource(strings = {"desc", "DESC", "descending", "DESCENDING", "Desc", "Descending"})
     @DisplayName("sortByIdentity should handle various descending formats")
     void testSortByIdentityDescendingVariations(String order) {
-        carRepository.add(new Car("СЕ0303СХ", "BMW", 2022, 5000, CarStatus.AVAILABLE));
-        carRepository.add(new Car("СЕ0304СХ", "Audi", 2020, 80000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0303СХ", "BMW X7", 2022, 5000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0304СХ", "Audi RS6", 2020, 80000, CarStatus.AVAILABLE));
         
         List<Car> sorted = carRepository.sortByIdentity(order);
         

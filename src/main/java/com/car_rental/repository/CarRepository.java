@@ -10,10 +10,6 @@ public class CarRepository extends GenericRepository<Car>{
         super(Car::getLicensePlate, "Car");
     }
 
-    public List<Car> sortByLicensePlate(){
-        return sortByComparator(Car.byLicensePlate());
-    }
-
     public List<Car> sortByYear(){
         return sortByComparator(Car.byYear());
     }
