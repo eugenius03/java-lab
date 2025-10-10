@@ -2,12 +2,15 @@ package com.car_rental.model;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.Objects;
 
 import com.car_rental.exception.InvalidDataException;
 import com.car_rental.util.RentalUtil;
 
-public class Rental {
+public class Rental implements Comparable<Rental> {
+    private int id;
     private Car car;
     private Customer customer;
     private LocalDate startDate;
@@ -17,7 +20,8 @@ public class Rental {
 
     }
 
-    public Rental(Car car, Customer customer, String startDate, String endDate){
+    public Rental(int id, Car car, Customer customer, String startDate, String endDate){
+        setId(id);
         setCar(car);
         this.customer = customer;
         setStartDate(startDate);
@@ -27,11 +31,37 @@ public class Rental {
         }
     }
 
-    public Rental(Car car, Customer customer){
+    public Rental(int id, Car car, Customer customer){
+        setId(id);
         setCar(car);
         this.customer = customer;
         this.startDate = LocalDate.now();
         this.endDate = LocalDate.now().plusDays(10);
+    }
+
+    @Override
+    public int compareTo(Rental other){
+        return Long.compare(
+            ChronoUnit.DAYS.between(getStartDate(), getEndDate()),
+            ChronoUnit.DAYS.between(other.getStartDate(), other.getEndDate())
+        );
+    }
+
+    public static Comparator<Rental> byStartDate(){
+        return Comparator.comparing(Rental::getStartDate);
+    }
+
+    public static Comparator<Rental> byEndDate(){
+        return Comparator.comparing(Rental::getEndDate);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        RentalUtil.ValidateId(id);
+        this.id = id;
     }
 
     public void setCar(Car car){
@@ -73,12 +103,12 @@ public class Rental {
         return endDate;
     }
 
-    public static Rental createRental(Car car, Customer customer, String startDate, String endDate){
-        return new Rental(car, customer, startDate, endDate);
+    public static Rental createRental(int id, Car car, Customer customer, String startDate, String endDate){
+        return new Rental(id, car, customer, startDate, endDate);
     }
 
-    public static Rental createRental(Car car, Customer customer){
-        return new Rental(car, customer);
+    public static Rental createRental(int id, Car car, Customer customer){
+        return new Rental(id, car, customer);
     }
 
     @Override

@@ -23,4 +23,8 @@ class ValidationHelper {
         return number < 0.0;
     }
 
+    static boolean isNegative (int number){
+        return number < 0.0;
+    }
+
 }
