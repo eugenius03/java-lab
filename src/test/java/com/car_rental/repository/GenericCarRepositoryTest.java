@@ -4,37 +4,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.car_rental.model.Car;
 import com.car_rental.model.CarStatus;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
-
-class CarRepositoryTest {
+class GenericCarRepositoryTest {
 
     private GenericRepository<Car> carRepository;
-    private ListAppender<ILoggingEvent> logAppender;
     private IdentityExtractor<Car> licensePlateExtractor;
 
     @BeforeEach
     void setUp() {
-
-        Logger logger = (Logger) LoggerFactory.getLogger(GenericRepository.class);
-        logAppender = new ListAppender<>();
-        logAppender.start();
-        logger.addAppender(logAppender);
         
         licensePlateExtractor = Car::getLicensePlate;
         
@@ -298,4 +288,142 @@ class CarRepositoryTest {
         assertEquals(0, carRepository.size());
         
     }
+    // ========== sortByDefault() Tests ==========
+    
+    @Test
+    @DisplayName("sortByDefault should sort cars by status priority (natural ordering)")
+    void testSortByDefaultValidCars() {
+        carRepository.add(new Car("СЕ0303СХ", "Toyota", 2020, 50000, CarStatus.RENTED));
+        carRepository.add(new Car("СЕ0304СХ", "Honda", 2021, 30000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0305СХ", "Ford", 2019, 80000, CarStatus.MAINTENANCE));
+        carRepository.add(new Car("СЕ0305СХ", "BMW", 2022, 10000, CarStatus.RESERVED));
+        
+        List<Car> sorted = carRepository.sortByDefault();
+        
+        assertEquals(4, sorted.size());
+        // Should be sorted by status priority: AVAILABLE(1), RESERVED(2), RENTED(3), MAINTENANCE(4)
+        assertEquals(CarStatus.AVAILABLE, sorted.get(0).getStatus());
+        assertEquals(CarStatus.RESERVED, sorted.get(1).getStatus());
+        assertEquals(CarStatus.RENTED, sorted.get(2).getStatus());
+        assertEquals(CarStatus.MAINTENANCE, sorted.get(3).getStatus());
+        
+    }
+
+    @Test
+    @DisplayName("sortByDefault should handle empty repository")
+    void testSortByDefaultEmptyRepository() {
+        List<Car> sorted = carRepository.sortByDefault();
+        
+        assertTrue(sorted.isEmpty());        
+    }
+
+    @Test
+    @DisplayName("sortByDefault should not modify original repository")
+    void testSortByDefaultDoesNotModifyOriginal() {
+        Car car1 = new Car("СЕ0303СХ", "Honda", 2021, 30000, CarStatus.RENTED);
+        Car car2 = new Car("СЕ0304СХ", "Toyota", 2020, 50000, CarStatus.AVAILABLE);
+        
+        carRepository.add(car1);
+        carRepository.add(car2);
+        
+        List<Car> sorted = carRepository.sortByDefault();
+        List<Car> original = carRepository.getAll();
+        
+        assertEquals(CarStatus.AVAILABLE, sorted.get(0).getStatus());
+        assertEquals(CarStatus.RENTED, sorted.get(1).getStatus());
+        
+        assertEquals("СЕ0303СХ", original.get(0).getLicensePlate());
+        assertEquals("СЕ0304СХ", original.get(1).getLicensePlate());
+    }
+
+    // ========== sortByComparator() Tests ==========
+    
+    @Test
+    @DisplayName("sortByComparator should sort using provided comparator")
+    void testSortByComparatorValid() {
+        carRepository.add(new Car("СЕ0303СХ", "Honda", 2021, 30000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0304СХ", "Toyota", 2020, 50000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0305СХ", "Ford", 2022, 10000, CarStatus.AVAILABLE));
+        
+        List<Car> sortedByYear = carRepository.sortByComparator(Car.byYear().reversed());
+        
+        assertEquals(3, sortedByYear.size());
+        assertEquals(2022, sortedByYear.get(0).getYear());
+        assertEquals(2021, sortedByYear.get(1).getYear());
+        assertEquals(2020, sortedByYear.get(2).getYear());
+    }
+
+    @Test
+    @DisplayName("sortByComparator should handle null comparator")
+    void testSortByComparatorNull() {
+        carRepository.add(new Car("СЕ0303СХ", "Toyota", 2020, 50000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0304СХ", "Honda", 2021, 30000, CarStatus.AVAILABLE));
+        
+        List<Car> result = carRepository.sortByComparator(null);
+        
+        assertEquals(2, result.size());
+        assertEquals("СЕ0303СХ", result.get(0).getLicensePlate());
+        assertEquals("СЕ0304СХ", result.get(1).getLicensePlate());    
+        
+        List<Car> byMileage = carRepository.sortByComparator(Car.byMileage());
+
+        assertEquals(50000, byMileage.get(0).getMileage(), 0.001);
+        assertEquals(30000, byMileage.get(1).getMileage(), 0.001);
+    }
+
+    @Test
+    @DisplayName("sortByComparator should handle empty repository")
+    void testSortByComparatorEmpty() {
+        List<Car> sorted = carRepository.sortByComparator(Car.byYear());
+        
+        assertTrue(sorted.isEmpty());    
+    }
+    // ========== sortByIdentity() Tests ==========
+
+    @ParameterizedTest
+    @ValueSource(strings = {"asc", "ASC", "ascending", "ASCENDING", "Asc", "Ascending"})
+    @DisplayName("sortByIdentity should handle various ascending formats")
+    void testSortByIdentityAscendingVariations(String order) {
+        carRepository.add(new Car("СЕ0303СХ", "BMW", 2022, 5000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0304СХ", "Audi", 2020, 80000, CarStatus.AVAILABLE));
+        
+        List<Car> sorted = carRepository.sortByIdentity(order);
+        
+        assertEquals("СЕ0303СХ", sorted.get(0).getLicensePlate());
+        assertEquals("СЕ0304СХ", sorted.get(1).getLicensePlate());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"desc", "DESC", "descending", "DESCENDING", "Desc", "Descending"})
+    @DisplayName("sortByIdentity should handle various descending formats")
+    void testSortByIdentityDescendingVariations(String order) {
+        carRepository.add(new Car("СЕ0303СХ", "BMW", 2022, 5000, CarStatus.AVAILABLE));
+        carRepository.add(new Car("СЕ0304СХ", "Audi", 2020, 80000, CarStatus.AVAILABLE));
+        
+        List<Car> sorted = carRepository.sortByIdentity(order);
+        
+        assertEquals("СЕ0304СХ", sorted.get(0).getLicensePlate());
+        assertEquals("СЕ0303СХ", sorted.get(1).getLicensePlate());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("sortByIdentity should handle null order parameter")
+    void testSortByIdentityNullOrder(String order) {
+        carRepository.add(new Car("СЕ0303СХ", "Toyota", 2020, 50000, CarStatus.AVAILABLE));
+        
+        List<Car> result = carRepository.sortByIdentity(order);
+        
+        assertEquals(1, result.size());
+        assertEquals("СЕ0303СХ", result.get(0).getLicensePlate());
+    }
+
+    @Test
+    @DisplayName("sortByIdentity should handle empty repository")
+    void testSortByIdentityEmpty() {
+        List<Car> sorted = carRepository.sortByIdentity("asc");
+        
+        assertTrue(sorted.isEmpty());
+    }
+
 }

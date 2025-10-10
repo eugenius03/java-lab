@@ -1,13 +1,17 @@
 package com.car_rental.repository;
 
+import java.util.List;
+
 import com.car_rental.model.Branch;
 
-public class BranchRepository{
-
-    private final GenericRepository<Branch> repository;
+public class BranchRepository extends GenericRepository<Branch>{
 
     public BranchRepository(){
-        repository = new GenericRepository<>(Branch::name, "Branch");
+        super(Branch::name, "Branch");
+    }
+
+    public List<Branch> sortByLocation(){
+        return sortByComparator(Branch.byLocation());
     }
 
     

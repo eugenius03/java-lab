@@ -1,8 +1,10 @@
 package com.car_rental.repository;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +68,67 @@ public class GenericRepository<T> {
 
     public T get(int index){
         return items.get(index);
+    }
+
+    public List<T> sortByDefault(){
+        if(items.isEmpty()){
+            logger.warn(String.format("Attempted to sort an empty array %s", entityType));
+            return new ArrayList<>();
+        }
+        logger.info(String.format("Successfully sorted %s by default", entityType));
+        return items.stream().sorted().toList();
+
+    }
+
+    public List<T> sortByComparator(Comparator<T> comparator){
+        if(items.isEmpty()){
+            logger.warn(String.format("Attempted to sort an empty array %s", entityType));
+            return new ArrayList<>();
+        }
+
+        if(comparator == null){
+            logger.warn(String.format("Attempted to sort by null, returning the whole list %s", entityType));
+            return new ArrayList<>(items);
+        }
+
+        logger.info(String.format("Successfully sorted %s by comparator", entityType));
+        return items.stream().sorted(comparator).toList();
+
+    }
+
+    public List<T> sortByIdentity(String order){
+        if(items.isEmpty()){
+            logger.warn(String.format("Attempted to sort an empty array %s", entityType));
+            return new ArrayList<>();
+        }
+
+        if(order == null){
+            logger.warn(String.format("Attempted to sort by null, returning whole list %s", entityType));
+            return new ArrayList<>(items);
+        }
+
+        Comparator<T> baseComparator = Comparator.comparing(
+            identityExtractor::extractIdentity
+        );
+        
+        Comparator<T> finalComparator = switch (order.trim().toLowerCase()) {
+            case "asc", "ascending" -> {
+                logger.info(String.format("Sorted %s by identity in ascending order", entityType));
+                yield baseComparator;
+            }
+            case "desc", "descending" -> {
+                logger.info(String.format("Sorted %s by identity in descending order", entityType));
+                yield baseComparator.reversed();
+            }
+            default -> {
+                logger.warn(String.format("Invalid sort order '%s' for %s. Using ascending order.", order, entityType));
+                yield baseComparator;
+            }
+        };
+        
+        return items.stream()
+            .sorted(finalComparator)
+            .collect(Collectors.toList());
     }
 
     public boolean remove(T item){

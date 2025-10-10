@@ -1,13 +1,25 @@
 package com.car_rental.repository;
 
+import java.util.List;
+
 import com.car_rental.model.Car;
 
-public class CarRepository{
-
-    private final GenericRepository<Car> repository;
+public class CarRepository extends GenericRepository<Car>{
 
     public CarRepository(){
-        repository = new GenericRepository<>(Car::getLicensePlate, "Car");
+        super(Car::getLicensePlate, "Car");
+    }
+
+    public List<Car> sortByLicensePlate(){
+        return sortByComparator(Car.byLicensePlate());
+    }
+
+    public List<Car> sortByYear(){
+        return sortByComparator(Car.byYear());
+    }
+
+    public List<Car> sortByMileage(){
+        return sortByComparator(Car.byMileage());
     }
 
     

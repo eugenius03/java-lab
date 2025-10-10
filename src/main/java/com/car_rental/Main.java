@@ -22,8 +22,8 @@ public class Main {
         customers.add(new Customer("Olena", "Shevchenko", "ХЕН123456", "12.05.1992"));
         customers.add(new Customer("Nikita", "Kovalenko", "ХНВ123456", "03.11.1988"));
 
-        Rental rent1 = new Rental(cars.get(0), customers.get(0), "01.09.2025", "05.09.2025");
-        Rental rent2 = new Rental(cars.get(1), customers.get(0)); // default endDate = now+10 days
+        Rental rent1 = new Rental(0, cars.get(0), customers.get(0), "01.09.2025", "05.09.2025");
+        Rental rent2 = new Rental(1, cars.get(1), customers.get(0)); // default endDate = now+10 days
 
         List<Car> fileCars = CarFileParser.parseFromCSV("cars.csv");
         cars.addAll(fileCars);

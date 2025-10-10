@@ -54,12 +54,12 @@ public class Car implements Comparable<Car> {
         };
     }
 
-    public static Comparator<Car> byLicensePlate() {
-        return Comparator.comparing(Car::getLicensePlate);
-    }
-
     public static Comparator<Car> byYear() {
         return Comparator.comparing(Car::getYear);
+    }
+
+    public static Comparator<Car> byMileage() {
+        return Comparator.comparing(Car::getMileage);
     }
 
     public void setLicensePlate(String licensePlate){
