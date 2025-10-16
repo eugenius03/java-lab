@@ -5,16 +5,6 @@ import com.car_rental.model.Car;
 import com.car_rental.model.CarStatus;
 
 public class RentalUtil {
-
-    public static boolean isValidId(int id){
-        return ValidationHelper.isNegative(id);
-    }
-
-    public static void ValidateId(int id){
-        if(!isValidId(id)){
-            throw new InvalidDataException("Invaid id, must be non-negative");
-        }
-    }
     
     public static boolean isValidDateFormat(String date){
         return ValidationHelper.isStringMatchPattern(date, "\\d{2}\\.\\d{2}\\.\\d{4}");

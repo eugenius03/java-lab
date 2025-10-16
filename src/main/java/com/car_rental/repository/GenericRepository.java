@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,6 +98,14 @@ public class GenericRepository<T> {
 
     }
 
+    protected Stream<T> findByPredicate(Predicate<T> filter){
+        if(filter == null){
+            logger.warn(String.format("Tried to find without a filter %s", entityType));
+            return items.stream();
+        }
+        return items.stream().filter(filter);
+    }
+
     public List<T> sortByIdentity(String order){
         if(items.isEmpty()){
             logger.warn(String.format("Attempted to sort an empty array %s", entityType));
@@ -176,7 +186,7 @@ public class GenericRepository<T> {
         return findByIdentity(identity).isPresent();
     }
 
-    public Optional<T> findByIdentity(String identity) {
+    protected Optional<T> findByIdentity(String identity) {
         if (identity == null) {
             logger.warn(String.format("Attempted to find %s with null identity", entityType));
             return Optional.empty();

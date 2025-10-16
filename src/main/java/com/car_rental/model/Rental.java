@@ -10,7 +10,7 @@ import com.car_rental.exception.InvalidDataException;
 import com.car_rental.util.RentalUtil;
 
 public class Rental implements Comparable<Rental> {
-    private int id;
+    private String id;
     private Car car;
     private Customer customer;
     private LocalDate startDate;
@@ -20,7 +20,7 @@ public class Rental implements Comparable<Rental> {
 
     }
 
-    public Rental(int id, Car car, Customer customer, String startDate, String endDate){
+    public Rental(String id, Car car, Customer customer, String startDate, String endDate){
         setId(id);
         setCar(car);
         this.customer = customer;
@@ -31,7 +31,7 @@ public class Rental implements Comparable<Rental> {
         }
     }
 
-    public Rental(int id, Car car, Customer customer){
+    public Rental(String id, Car car, Customer customer){
         setId(id);
         setCar(car);
         this.customer = customer;
@@ -55,13 +55,12 @@ public class Rental implements Comparable<Rental> {
         return Comparator.comparing(Rental::getEndDate);
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
-        RentalUtil.ValidateId(id);
-        this.id = id;
+    public void setId(String id) {
+        this.id = id.trim();
     }
 
     public void setCar(Car car){
@@ -103,11 +102,11 @@ public class Rental implements Comparable<Rental> {
         return endDate;
     }
 
-    public static Rental createRental(int id, Car car, Customer customer, String startDate, String endDate){
+    public static Rental createRental(String id, Car car, Customer customer, String startDate, String endDate){
         return new Rental(id, car, customer, startDate, endDate);
     }
 
-    public static Rental createRental(int id, Car car, Customer customer){
+    public static Rental createRental(String id, Car car, Customer customer){
         return new Rental(id, car, customer);
     }
 

@@ -8,7 +8,7 @@ import java.util.Objects;
 import com.car_rental.util.PaymentUtil;
 
 public class Payment implements Comparable<Payment> {
-    private int id;
+    private String id;
     private Rental rental;
     private double amount;
     private LocalDate paymentDate;
@@ -16,7 +16,7 @@ public class Payment implements Comparable<Payment> {
 
     public Payment() {}
 
-    public Payment(int id, Rental rental, double amount, String paymentDate, PaymentMethod paymentMethod) {
+    public Payment(String id, Rental rental, double amount, String paymentDate, PaymentMethod paymentMethod) {
         setId(id);
         setRental(rental);
         rental.getCar().setStatus(CarStatus.RENTED);
@@ -25,7 +25,7 @@ public class Payment implements Comparable<Payment> {
         this.paymentMethod = paymentMethod;
     }
 
-    public Payment(int id, Rental rental, double amount, String paymentDate, String paymentMethod) {
+    public Payment(String id, Rental rental, double amount, String paymentDate, String paymentMethod) {
         setId(id);
         setRental(rental);
         rental.getCar().setStatus(CarStatus.RENTED);
@@ -34,7 +34,7 @@ public class Payment implements Comparable<Payment> {
         this.paymentMethod = PaymentMethod.parsePaymentMethod(paymentMethod);
     }
 
-    public Payment(int id, Rental rental, double amount, PaymentMethod paymentMethod) {
+    public Payment(String id, Rental rental, double amount, PaymentMethod paymentMethod) {
         setId(id);
         setRental(rental);
         setAmount(amount);
@@ -42,7 +42,7 @@ public class Payment implements Comparable<Payment> {
         this.paymentMethod = paymentMethod;
     }
 
-    public Payment(int id, Rental rental, double amount, String paymentMethod) {
+    public Payment(String id, Rental rental, double amount, String paymentMethod) {
         setId(id);
         setRental(rental);
         setAmount(amount);
@@ -52,7 +52,7 @@ public class Payment implements Comparable<Payment> {
 
     @Override
     public int compareTo(Payment other){
-        return Integer.compare(id, other.id);
+        return this.getId().compareTo(other.getId());
     }
 
     public static Comparator<Payment> byPaymentDate(){
@@ -63,13 +63,12 @@ public class Payment implements Comparable<Payment> {
         return Comparator.comparing(Payment::getAmount);
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
-        PaymentUtil.validateAmount(amount);
-        this.id = id;
+    public void setId(String id) {
+        this.id = id.trim();
     }
 
     public void setRental(Rental rental){
@@ -108,19 +107,19 @@ public class Payment implements Comparable<Payment> {
         return paymentMethod;
     }
 
-    public Payment createPayment(int id, Rental rental, double amount, String paymentDate, PaymentMethod paymentMethod){
+    public Payment createPayment(String id, Rental rental, double amount, String paymentDate, PaymentMethod paymentMethod){
         return new Payment(id, rental, amount, paymentDate, paymentMethod);
     }
 
-    public Payment createPayment(int id, Rental rental, double amount, String paymentDate, String paymentMethod){
+    public Payment createPayment(String id, Rental rental, double amount, String paymentDate, String paymentMethod){
         return new Payment(id, rental, amount, paymentDate, paymentMethod);
     }
 
-    public Payment createPayment(int id, Rental rental, double amount, PaymentMethod paymentMethod){
+    public Payment createPayment(String id, Rental rental, double amount, PaymentMethod paymentMethod){
         return new Payment(id, rental, amount, paymentMethod);
     }
 
-    public Payment createPayment(int id, Rental rental, double amount, String paymentMethod){
+    public Payment createPayment(String id, Rental rental, double amount, String paymentMethod){
         return new Payment(id, rental, amount, paymentMethod);
     }
 
