@@ -1,14 +1,18 @@
 package com.car_rental.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
-
-import java.util.List;
-import java.util.Optional;
 
 import com.car_rental.model.Car;
 import com.car_rental.model.CarStatus;
@@ -57,9 +61,9 @@ class RentalRepositoryTest {
         List<Rental> sortedRentals = rentalRepository.sortByStartDate();
 
         assertEquals(3, sortedRentals.size());
-        assertEquals("10.03.2024", sortedRentals.get(0).getStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("15.03.2024", sortedRentals.get(1).getStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("20.03.2024", sortedRentals.get(2).getStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("10.03.2024", sortedRentals.get(0).getStartDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("15.03.2024", sortedRentals.get(1).getStartDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("20.03.2024", sortedRentals.get(2).getStartDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     @Test
@@ -78,7 +82,7 @@ class RentalRepositoryTest {
         List<Rental> sortedRentals = rentalRepository.sortByStartDate();
 
         assertEquals(1, sortedRentals.size());
-        assertEquals("15.03.2024", sortedRentals.get(0).getStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("15.03.2024", sortedRentals.get(0).getStartDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     @Test
@@ -90,8 +94,8 @@ class RentalRepositoryTest {
         List<Rental> sortedRentals = rentalRepository.sortByStartDate();
 
         assertEquals(2, sortedRentals.size());
-        assertEquals("15.03.2024", sortedRentals.get(0).getStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("15.03.2024", sortedRentals.get(1).getStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("15.03.2024", sortedRentals.get(0).getStartDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("15.03.2024", sortedRentals.get(1).getStartDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     // ========== sortByEndDate() Tests ==========
@@ -106,9 +110,9 @@ class RentalRepositoryTest {
         List<Rental> sortedRentals = rentalRepository.sortByEndDate();
 
         assertEquals(3, sortedRentals.size());
-        assertEquals("20.03.2024", sortedRentals.get(0).getEndDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("25.03.2024", sortedRentals.get(1).getEndDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("30.03.2024", sortedRentals.get(2).getEndDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("20.03.2024", sortedRentals.get(0).getEndDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("25.03.2024", sortedRentals.get(1).getEndDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("30.03.2024", sortedRentals.get(2).getEndDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     @Test
@@ -127,7 +131,7 @@ class RentalRepositoryTest {
         List<Rental> sortedRentals = rentalRepository.sortByEndDate();
 
         assertEquals(1, sortedRentals.size());
-        assertEquals("20.03.2024", sortedRentals.get(0).getEndDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("20.03.2024", sortedRentals.get(0).getEndDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     @Test
@@ -139,8 +143,8 @@ class RentalRepositoryTest {
         List<Rental> sortedRentals = rentalRepository.sortByEndDate();
 
         assertEquals(2, sortedRentals.size());
-        assertEquals("20.03.2024", sortedRentals.get(0).getEndDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("20.03.2024", sortedRentals.get(1).getEndDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("20.03.2024", sortedRentals.get(0).getEndDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("20.03.2024", sortedRentals.get(1).getEndDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     // ========== findById() Tests ==========
@@ -368,13 +372,13 @@ class RentalRepositoryTest {
 
         // Test sorting by start date
         List<Rental> byStartDate = rentalRepository.sortByStartDate();
-        assertEquals("05.03.2024", byStartDate.get(0).getStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("20.03.2024", byStartDate.get(3).getStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("05.03.2024", byStartDate.get(0).getStartDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("20.03.2024", byStartDate.get(3).getStartDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 
         // Test sorting by end date
         List<Rental> byEndDate = rentalRepository.sortByEndDate();
-        assertEquals("15.03.2024", byEndDate.get(0).getEndDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("30.03.2024", byEndDate.get(3).getEndDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("15.03.2024", byEndDate.get(0).getEndDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("30.03.2024", byEndDate.get(3).getEndDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 
         // Test finding by ID
         Optional<Rental> foundRental = rentalRepository.findById("R002");

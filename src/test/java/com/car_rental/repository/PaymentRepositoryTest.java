@@ -1,14 +1,17 @@
 package com.car_rental.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
-
-import java.util.List;
-import java.util.Optional;
 
 import com.car_rental.model.Car;
 import com.car_rental.model.CarStatus;
@@ -64,9 +67,9 @@ class PaymentRepositoryTest {
         List<Payment> sortedPayments = paymentRepository.sortByPaymentDate();
 
         assertEquals(3, sortedPayments.size());
-        assertEquals("10.03.2024", sortedPayments.get(0).getPaymentDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("15.03.2024", sortedPayments.get(1).getPaymentDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("20.03.2024", sortedPayments.get(2).getPaymentDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("10.03.2024", sortedPayments.get(0).getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("15.03.2024", sortedPayments.get(1).getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("20.03.2024", sortedPayments.get(2).getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     @Test
@@ -85,7 +88,7 @@ class PaymentRepositoryTest {
         List<Payment> sortedPayments = paymentRepository.sortByPaymentDate();
 
         assertEquals(1, sortedPayments.size());
-        assertEquals("15.03.2024", sortedPayments.get(0).getPaymentDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("15.03.2024", sortedPayments.get(0).getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     @Test
@@ -97,8 +100,8 @@ class PaymentRepositoryTest {
         List<Payment> sortedPayments = paymentRepository.sortByPaymentDate();
 
         assertEquals(2, sortedPayments.size());
-        assertEquals("15.03.2024", sortedPayments.get(0).getPaymentDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("15.03.2024", sortedPayments.get(1).getPaymentDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("15.03.2024", sortedPayments.get(0).getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("15.03.2024", sortedPayments.get(1).getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     // ========== sortByAmount() Tests ==========
@@ -305,8 +308,8 @@ class PaymentRepositoryTest {
 
         // Test sorting by payment date
         List<Payment> byDate = paymentRepository.sortByPaymentDate();
-        assertEquals("05.03.2024", byDate.get(0).getPaymentDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        assertEquals("20.03.2024", byDate.get(3).getPaymentDate().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("05.03.2024", byDate.get(0).getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        assertEquals("20.03.2024", byDate.get(3).getPaymentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 
         // Test sorting by amount
         List<Payment> byAmount = paymentRepository.sortByAmount();
