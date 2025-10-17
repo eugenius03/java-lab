@@ -3,16 +3,6 @@ package com.car_rental.util;
 import com.car_rental.exception.InvalidDataException;
 
 public class PaymentUtil {
-
-    public static boolean isValidId(int id){
-        return !ValidationHelper.isNegative(id);
-    }
-
-    public void validateId(int id){
-        if(!isValidId(id)){
-            throw new InvalidDataException("Invalid id, must be non-negative");
-        }
-    }
     
     public static boolean isValidAmount(double amount){
         return !ValidationHelper.isNegative(amount);

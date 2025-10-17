@@ -1,5 +1,7 @@
 package com.car_rental.model;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 
 import com.car_rental.util.CustomerUtil;
@@ -27,7 +29,8 @@ public record Customer (String firstName, String lastName, String driverLicense,
     }
 
     public static Comparator<Customer> byBirthDate(){
-        return Comparator.comparing(Customer::birthDate);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        return Comparator.comparing(c -> LocalDate.parse(c.birthDate(), formatter));
     }
 
 }
