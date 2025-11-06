@@ -6,7 +6,12 @@ import java.util.Comparator;
 
 import com.car_rental.util.CustomerUtil;
 
-public record Customer (String firstName, String lastName, String driverLicense, String birthDate) implements Comparable<Customer> {
+public record Customer (
+    String firstName,
+    String lastName,
+    String driverLicense,
+    String birthDate
+    ) implements Comparable<Customer> {
 
     public Customer{
         CustomerUtil.validateName(firstName);

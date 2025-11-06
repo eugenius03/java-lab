@@ -4,8 +4,12 @@ import java.util.Comparator;
 import java.util.Objects;
 
 import com.car_rental.util.CarUtil;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Car implements Comparable<Car> {
+
+    @JsonProperty("license_plate")
     private String licensePlate;
     private String model;
     private int year;
@@ -16,9 +20,16 @@ public class Car implements Comparable<Car> {
 
     }
 
-    public Car(String licensePlate, String model, int year, double mileage, CarStatus status){
-        setModel(model);
+    @JsonCreator
+    public Car(
+        @JsonProperty("license_plate") String licensePlate,
+        @JsonProperty("model") String model,
+        @JsonProperty("year") int year,
+        @JsonProperty("mileage") double mileage,
+        @JsonProperty("status") CarStatus status
+    ) {
         setLicensePlate(licensePlate);
+        setModel(model);
         setYear(year);
         setMileage(mileage);
         this.status = status;
