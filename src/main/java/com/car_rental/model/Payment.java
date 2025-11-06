@@ -6,17 +6,33 @@ import java.util.Comparator;
 import java.util.Objects;
 
 import com.car_rental.util.PaymentUtil;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Payment implements Comparable<Payment> {
+
+    @JsonProperty("payment_id")
     private String id;
     private Rental rental;
     private double amount;
+
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate paymentDate;
+
+    @JsonProperty("method")
     private PaymentMethod paymentMethod;
 
     public Payment() {}
 
-    public Payment(String id, Rental rental, double amount, String paymentDate, PaymentMethod paymentMethod) {
+    @JsonCreator
+    public Payment(
+        @JsonProperty("payment_id") String id,
+        @JsonProperty("rental") Rental rental,
+        @JsonProperty("amount") double amount,
+        @JsonProperty("payment_date") String paymentDate,
+        @JsonProperty("method") PaymentMethod paymentMethod
+    ) {
         setId(id);
         setRental(rental);
         rental.getCar().setStatus(CarStatus.RENTED);

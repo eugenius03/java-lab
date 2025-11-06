@@ -4,7 +4,10 @@ import java.util.Comparator;
 
 import com.car_rental.util.BranchUtil;
 
-public record Branch (String name, String location) implements Comparable<Branch> {
+public record Branch (
+    String name,
+    String location
+    ) implements Comparable<Branch> {
 
     public Branch {
         BranchUtil.validateName(name);
