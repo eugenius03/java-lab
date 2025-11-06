@@ -8,19 +8,37 @@ import java.util.Objects;
 
 import com.car_rental.exception.InvalidDataException;
 import com.car_rental.util.RentalUtil;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Rental implements Comparable<Rental> {
+
+    @JsonProperty("rental_id")
     private String id;
+
     private Car car;
     private Customer customer;
+
+    @JsonProperty("start_date")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate startDate;
+
+    @JsonProperty("end_date")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate endDate;
 
     public Rental(){
 
     }
 
-    public Rental(String id, Car car, Customer customer, String startDate, String endDate){
+    @JsonCreator
+    public Rental(
+        @JsonProperty("rental_id") String id,
+        @JsonProperty("car") Car car,
+        @JsonProperty("customer") Customer customer,
+        @JsonProperty("start_date") String startDate,
+        @JsonProperty("end_date") String endDate){
         setId(id);
         setCar(car);
         this.customer = customer;
