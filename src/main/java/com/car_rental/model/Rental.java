@@ -7,25 +7,33 @@ import java.util.Comparator;
 import java.util.Objects;
 
 import com.car_rental.exception.InvalidDataException;
-import com.car_rental.util.RentalUtil;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class Rental implements Comparable<Rental> {
 
+    @NotBlank(message = "Rental ID cannot be null or blank")
     @JsonProperty("rental_id")
     private String id;
 
+    @NotNull(message = "Car cannot be null")
     private Car car;
+
+    @NotNull(message = "Customer cannot be null")
     private Customer customer;
 
+    @NotNull(message = "Start date cannot be null or blank")
     @JsonProperty("start_date")
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "dd.MM.yyyy")
     private LocalDate startDate;
 
+    @NotNull(message = "End date cannot be null or blank")
     @JsonProperty("end_date")
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "dd.MM.yyyy")
     private LocalDate endDate;
 
     public Rental(){
@@ -82,7 +90,6 @@ public class Rental implements Comparable<Rental> {
     }
 
     public void setCar(Car car){
-        RentalUtil.validateCar(car);
         car.setStatus(CarStatus.RESERVED);
         this.car = car;
 
@@ -101,7 +108,6 @@ public class Rental implements Comparable<Rental> {
     }
 
     public void setStartDate(String startDate){
-        RentalUtil.ValidateDateFormat(startDate);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         this.startDate = LocalDate.parse(startDate, formatter);
     }
@@ -111,7 +117,6 @@ public class Rental implements Comparable<Rental> {
     }
 
     public void setEndDate(String endDate){
-        RentalUtil.ValidateDateFormat(endDate);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         this.endDate = LocalDate.parse(endDate, formatter);
     }
