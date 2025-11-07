@@ -32,8 +32,8 @@ public class Main {
         persistenceManager.load("cars", Car.class, "JSON")
         .stream().forEach(System.out::println);
         BranchRepository branches = new BranchRepository();
-        branches.add(new Branch("123", "123"));
-        System.out.println(branches.findByLocation("123"));
+        branches.add(new Branch("Name", "Location"));
+        System.out.println(branches.findByLocation("Location"));
 
         persistenceManager.save(branches.getAll(), "branches", Branch.class, "JSON");
 
@@ -50,8 +50,11 @@ public class Main {
         Rental rent1 = new Rental("0", cars.get(0), customerRepository.get(0), "01.09.2025", "05.09.2025");
         Rental rent2 = new Rental("1", cars.get(1), customerRepository.get(0)); // default endDate = now+10 days
 
+
         PaymentRepository payments = new PaymentRepository();
         payments.add(new Payment("1", rent2, 1000, PaymentMethod.CASH));
+
+        persistenceManager.saveAllFormats(payments.getAll(), "payments", Payment.class);
         //System.out.println(payments.findByIdentity("1").orElse(null).toString());
 
         List<Car> fileCars = CarFileParser.parseFromCSV("cars.csv");
