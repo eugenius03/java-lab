@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 import com.car_rental.util.ValidationUtil;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,6 +29,8 @@ public class Payment implements Comparable<Payment> {
 
     @NotNull(message = "Payment date cannot be null or blank")
     @JsonFormat(pattern = "dd.MM.yyyy")
+    @JsonProperty("payment_date")
+    @JsonAlias({"paymentDate", "payment_date"})
     private LocalDate paymentDate;
 
     @JsonProperty("method")
@@ -41,13 +44,18 @@ public class Payment implements Comparable<Payment> {
         @JsonProperty("payment_id") String id,
         @JsonProperty("rental") Rental rental,
         @JsonProperty("amount") double amount,
-        @JsonProperty("payment_date") String paymentDate,
+        @JsonProperty(value = "payment_date", defaultValue = "") String paymentDate,
         @JsonProperty("method") PaymentMethod paymentMethod
     ) {
         this.id = id.trim();
         this.rental = rental;
         this.amount = amount;
-        setPaymentDate(paymentDate);
+        if (paymentDate != null && !paymentDate.isEmpty()) {
+            setPaymentDate(paymentDate);
+        } else {
+            this.paymentDate = LocalDate.now();
+        }
+        this.paymentMethod = paymentMethod;
         ValidationUtil.validate(this);
         this.rental.getCar().setStatus(CarStatus.RENTED);
 
@@ -127,8 +135,12 @@ public class Payment implements Comparable<Payment> {
     }
 
     public void setPaymentDate(String paymentDate){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        this.paymentDate = LocalDate.parse(paymentDate, formatter);
+        if (paymentDate == null || paymentDate.isEmpty()) {
+            this.paymentDate = LocalDate.now();
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            this.paymentDate = LocalDate.parse(paymentDate, formatter);
+        }
     }
 
     public LocalDate getPaymentDate(){

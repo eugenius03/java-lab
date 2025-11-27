@@ -1,5 +1,6 @@
 package com.car_rental.repository;
 
+import com.car_rental.exception.InvalidDataException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,26 @@ public class GenericRepository<T> {
         }
 
         return modified;
+    }
+
+    public synchronized boolean update(T newItem) {
+        if (newItem == null) {
+            throw new InvalidDataException(entityType + " cannot be null");
+        }
+
+        String identity = identityExtractor.extractIdentity(newItem);
+        Optional<T> existingItem = findByIdentity(identity);
+
+        if (existingItem.isEmpty()) {
+            logger.warn("Cannot update: {} not found with identity: {}", entityType, identity);
+            return false;
+        }
+
+        items.remove(existingItem.get());
+        items.add(newItem);
+
+        logger.info("Updated {}: {}", entityType, identity);
+        return true;
     }
 
     public T get(int index) {
