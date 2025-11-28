@@ -5,22 +5,36 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Objects;
 
-import com.car_rental.util.PaymentUtil;
+import com.car_rental.util.ValidationUtil;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 public class Payment implements Comparable<Payment> {
 
+    @NotBlank(message = "Payment ID cannot be null or blank")
     @JsonProperty("payment_id")
     private String id;
+
+    @NotNull(message = "Rental cannot be null")
     private Rental rental;
+
+    @Positive(message = "Amount must be positive")
     private double amount;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @NotNull(message = "Payment date cannot be null or blank")
+    @JsonFormat(pattern = "dd.MM.yyyy")
+    @JsonProperty("payment_date")
+    @JsonAlias({"paymentDate", "payment_date"})
     private LocalDate paymentDate;
 
     @JsonProperty("method")
+    @NotNull(message = "Payment method cannot be null")
     private PaymentMethod paymentMethod;
 
     public Payment() {}
@@ -30,40 +44,57 @@ public class Payment implements Comparable<Payment> {
         @JsonProperty("payment_id") String id,
         @JsonProperty("rental") Rental rental,
         @JsonProperty("amount") double amount,
-        @JsonProperty("payment_date") String paymentDate,
+        @JsonProperty(value = "payment_date", defaultValue = "") String paymentDate,
         @JsonProperty("method") PaymentMethod paymentMethod
     ) {
-        setId(id);
-        setRental(rental);
-        rental.getCar().setStatus(CarStatus.RENTED);
-        setAmount(amount);
-        setPaymentDate(paymentDate);
+        this.id = id.trim();
+        this.rental = rental;
+        this.amount = amount;
+        if (paymentDate != null && !paymentDate.isEmpty()) {
+            setPaymentDate(paymentDate);
+        } else {
+            this.paymentDate = LocalDate.now();
+        }
         this.paymentMethod = paymentMethod;
+        ValidationUtil.validate(this);
+        this.rental.getCar().setStatus(CarStatus.RENTED);
+
     }
 
     public Payment(String id, Rental rental, double amount, String paymentDate, String paymentMethod) {
-        setId(id);
-        setRental(rental);
-        rental.getCar().setStatus(CarStatus.RENTED);
-        setAmount(amount);
+        this.id = id.trim();
+        this.rental = rental;
+        this.amount = amount;
         setPaymentDate(paymentDate);
         this.paymentMethod = PaymentMethod.parsePaymentMethod(paymentMethod);
+        
+        ValidationUtil.validate(this);
+
+        rental.getCar().setStatus(CarStatus.RENTED);
     }
 
     public Payment(String id, Rental rental, double amount, PaymentMethod paymentMethod) {
-        setId(id);
-        setRental(rental);
-        setAmount(amount);
+        this.id = id.trim();
+        this.rental = rental;
+        this.amount = amount;
         this.paymentDate = LocalDate.now();
         this.paymentMethod = paymentMethod;
+
+        ValidationUtil.validate(this);
+        
+        this.rental.getCar().setStatus(CarStatus.RENTED);
     }
 
     public Payment(String id, Rental rental, double amount, String paymentMethod) {
-        setId(id);
-        setRental(rental);
-        setAmount(amount);
+        this.id = id.trim();
+        this.rental = rental;
+        this.amount = amount;
         this.paymentDate = LocalDate.now();
         this.paymentMethod = PaymentMethod.parsePaymentMethod(paymentMethod);
+
+        ValidationUtil.validate(this);
+
+        this.rental.getCar().setStatus(CarStatus.RENTED);
     }
 
     @Override
@@ -88,7 +119,6 @@ public class Payment implements Comparable<Payment> {
     }
 
     public void setRental(Rental rental){
-        rental.getCar().setStatus(CarStatus.RENTED);
         this.rental = rental;
     }
 
@@ -97,7 +127,6 @@ public class Payment implements Comparable<Payment> {
     }
 
     public void setAmount(double amount){
-        PaymentUtil.validateAmount(amount);
         this.amount = amount;
     }
 
@@ -106,9 +135,12 @@ public class Payment implements Comparable<Payment> {
     }
 
     public void setPaymentDate(String paymentDate){
-        PaymentUtil.validateDateFormat(paymentDate);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        this.paymentDate = LocalDate.parse(paymentDate, formatter);
+        if (paymentDate == null || paymentDate.isEmpty()) {
+            this.paymentDate = LocalDate.now();
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            this.paymentDate = LocalDate.parse(paymentDate, formatter);
+        }
     }
 
     public LocalDate getPaymentDate(){

@@ -2,6 +2,8 @@ package com.car_rental.service;
 
 
 
+import java.time.format.DateTimeFormatter;
+
 import com.car_rental.model.Car;
 import com.car_rental.model.CarStatus;
 import com.car_rental.model.Customer;
@@ -48,8 +50,8 @@ public class ReportGenerator {
                 c.lastName(),
                 car.getModel(),
                 car.getLicensePlate(),
-                rental.getStartDate(),
-                rental.getEndDate());
+                rental.getStartDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                rental.getEndDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     public static String generatePaymentReport(Payment payment) {

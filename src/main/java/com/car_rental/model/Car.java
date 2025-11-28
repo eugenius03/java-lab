@@ -3,17 +3,37 @@ package com.car_rental.model;
 import java.util.Comparator;
 import java.util.Objects;
 
-import com.car_rental.util.CarUtil;
+import com.car_rental.util.ValidationUtil;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
 public class Car implements Comparable<Car> {
 
+    @NotBlank(message = "License plate cannot be null or blank")
+    @Pattern(
+            regexp = "^[АВЕКМНОРСТІХDIPYCE]{2}\\\\d{4}[АВЕКМНОРСТІХDIPYCE]{2}$|^(?!.*[ZV])[а-яА-ЯЇЄІҐїєіїa-zA-Z0-9]{3,8}$",
+            message = "License plate must match standard or individual format"
+    )
     @JsonProperty("license_plate")
     private String licensePlate;
+
+    @NotBlank(message = "Car model cannot be null or blank")
+    @Size(min = 5, max = 100, message = "Car model must be 5-100 characters long")
     private String model;
+
+    @Positive(message = "Year must be a positive number")
     private int year;
+
+    @Positive(message = "Mileage must be a positive number")
     private double mileage;
+
+    @NotNull(message = "Car status cannot be null")
     private CarStatus status;
 
     public Car(){
@@ -28,27 +48,36 @@ public class Car implements Comparable<Car> {
         @JsonProperty("mileage") double mileage,
         @JsonProperty("status") CarStatus status
     ) {
-        setLicensePlate(licensePlate);
-        setModel(model);
-        setYear(year);
-        setMileage(mileage);
+        this.licensePlate = licensePlate;
+        this.model = model;
+        this.year = year;
+        this.mileage = mileage;
         this.status = status;
+
+        ValidationUtil.validate(this);
     }
 
     public Car(String licensePlate, String model, int year, double mileage){
-        setLicensePlate(licensePlate);
-        setModel(model);
-        setYear(year);
-        setMileage(mileage);
+        this.licensePlate = licensePlate;
+        this.model = model;
+        this.year = year;
+        this.mileage = mileage;
         this.status = CarStatus.AVAILABLE;
+
+        ValidationUtil.validate(this);
+
     }
 
     public Car(String licensePlate, String model, int year, double mileage, String status){
-        setLicensePlate(licensePlate);
-        setModel(model);
-        setYear(year);
-        setMileage(mileage);
+        this.licensePlate = licensePlate;
+        this.model = model;
+        this.year = year;
+        this.mileage = mileage;
+        this.status = CarStatus.AVAILABLE;
         this.status = CarStatus.parseCarStatus(status);
+
+        ValidationUtil.validate(this);
+
     }
 
     @Override
@@ -74,7 +103,6 @@ public class Car implements Comparable<Car> {
     }
 
     public void setLicensePlate(String licensePlate){
-        CarUtil.validateLicensePlate(licensePlate);
         this.licensePlate = licensePlate;
     }
 
@@ -83,7 +111,6 @@ public class Car implements Comparable<Car> {
     }
 
     public void setModel(String model){
-        CarUtil.validateModel(model);
         this.model = model;
     }
 
@@ -92,7 +119,6 @@ public class Car implements Comparable<Car> {
     }
 
     public void setYear(int year){
-        CarUtil.validateYear(year);
         this.year = year;
     }
 
@@ -101,7 +127,6 @@ public class Car implements Comparable<Car> {
     }
 
     public void setMileage(double mileage){
-        CarUtil.validateMileage(mileage);
         this.mileage = mileage;
     }
 
@@ -118,15 +143,21 @@ public class Car implements Comparable<Car> {
     }
 
     public static Car createCar(String licensePlate, String model, int year, double mileage, CarStatus status){
-        return new Car(licensePlate, model, year, mileage, status);
+        Car car = new Car(licensePlate, model, year, mileage, status);
+        ValidationUtil.validate(car);
+        return car;
     }
 
     public static Car createCar(String licensePlate, String model, int year, double mileage){
-        return new Car(licensePlate, model, year, mileage, CarStatus.AVAILABLE);
+        Car car = new Car(licensePlate, model, year, mileage);
+        ValidationUtil.validate(car);
+        return car;
     }
 
     public static Car createCar(String licensePlate, String model, int year, double mileage, String status){
-        return new Car(licensePlate, model, year, mileage, status);
+        Car car = new Car(licensePlate, model, year, mileage, status);
+        ValidationUtil.validate(car);
+        return car;
     }
 
     @Override

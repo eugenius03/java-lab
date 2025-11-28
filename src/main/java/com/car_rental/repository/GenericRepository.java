@@ -1,5 +1,9 @@
 package com.car_rental.repository;
 
+import com.car_rental.exception.InvalidDataException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -8,25 +12,22 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class GenericRepository<T> {
     private static final Logger logger = LoggerFactory.getLogger(GenericRepository.class);
-    
+
     private final List<T> items;
     private final IdentityExtractor<T> identityExtractor;
     private final String entityType;
 
-    public GenericRepository(IdentityExtractor<T> identityExtractor, String entityType){
+    public GenericRepository(IdentityExtractor<T> identityExtractor, String entityType) {
         this.items = new ArrayList<>();
         this.identityExtractor = identityExtractor;
         this.entityType = entityType;
         logger.info(String.format("Created repository for %s", entityType));
     }
 
-    public boolean add(T item){
-        if(item == null){
+    public synchronized boolean add(T item) {
+        if (item == null) {
             logger.warn(String.format("Attempted to add null %s", entityType));
             return false;
         }
@@ -38,42 +39,62 @@ public class GenericRepository<T> {
         }
 
         boolean added = items.add(item);
-        if (added){
+        if (added) {
             logger.info(String.format("Added %s: %s", entityType, identity));
         }
         return added;
     }
 
-    public boolean addAll(List<T> list){
-        if(list == null){
+    public synchronized boolean addAll(List<T> list) {
+        if (list == null) {
             logger.warn(String.format("Attempted to add null %ss", entityType));
             return false;
         }
 
         boolean modified = false;
-        for(T item: list){
+        for (T item : list) {
             String identity = identityExtractor.extractIdentity(item);
             if (findByIdentity(identity).isPresent()) {
                 logger.warn(String.format("Cannot add %s - already exists with identity: ", identity));
-            } else{
-                
+            } else {
+
                 if (items.add(item)) {
                     modified = true;
                     logger.info(String.format("Added %s: %s", entityType, identity));
                 }
-                
+
             }
         }
-        
+
         return modified;
     }
 
-    public T get(int index){
+    public synchronized boolean update(T newItem) {
+        if (newItem == null) {
+            throw new InvalidDataException(entityType + " cannot be null");
+        }
+
+        String identity = identityExtractor.extractIdentity(newItem);
+        Optional<T> existingItem = findByIdentity(identity);
+
+        if (existingItem.isEmpty()) {
+            logger.warn("Cannot update: {} not found with identity: {}", entityType, identity);
+            return false;
+        }
+
+        items.remove(existingItem.get());
+        items.add(newItem);
+
+        logger.info("Updated {}: {}", entityType, identity);
+        return true;
+    }
+
+    public T get(int index) {
         return items.get(index);
     }
 
-    public List<T> sortByDefault(){
-        if(items.isEmpty()){
+    public List<T> sortByDefault() {
+        if (items.isEmpty()) {
             logger.warn(String.format("Attempted to sort an empty array %s", entityType));
             return new ArrayList<>();
         }
@@ -82,13 +103,13 @@ public class GenericRepository<T> {
 
     }
 
-    public List<T> sortByComparator(Comparator<T> comparator){
-        if(items.isEmpty()){
+    public List<T> sortByComparator(Comparator<T> comparator) {
+        if (items.isEmpty()) {
             logger.warn(String.format("Attempted to sort an empty array %s", entityType));
             return new ArrayList<>();
         }
 
-        if(comparator == null){
+        if (comparator == null) {
             logger.warn(String.format("Attempted to sort by null, returning the whole list %s", entityType));
             return new ArrayList<>(items);
         }
@@ -98,29 +119,29 @@ public class GenericRepository<T> {
 
     }
 
-    protected Stream<T> findByPredicate(Predicate<T> filter){
-        if(filter == null){
+    protected Stream<T> findByPredicate(Predicate<T> filter) {
+        if (filter == null) {
             logger.warn(String.format("Tried to find without a filter %s", entityType));
             return items.stream();
         }
         return items.stream().filter(filter);
     }
 
-    public List<T> sortByIdentity(String order){
-        if(items.isEmpty()){
+    public List<T> sortByIdentity(String order) {
+        if (items.isEmpty()) {
             logger.warn(String.format("Attempted to sort an empty array %s", entityType));
             return new ArrayList<>();
         }
 
-        if(order == null){
+        if (order == null) {
             logger.warn(String.format("Attempted to sort by null, returning whole list %s", entityType));
             return new ArrayList<>(items);
         }
 
         Comparator<T> baseComparator = Comparator.comparing(
-            identityExtractor::extractIdentity
+                identityExtractor::extractIdentity
         );
-        
+
         Comparator<T> finalComparator = switch (order.trim().toLowerCase()) {
             case "asc", "ascending" -> {
                 logger.info(String.format("Sorted %s by identity in ascending order", entityType));
@@ -135,14 +156,14 @@ public class GenericRepository<T> {
                 yield baseComparator;
             }
         };
-        
+
         return items.stream()
-            .sorted(finalComparator)
-            .collect(Collectors.toList());
+                .sorted(finalComparator)
+                .collect(Collectors.toList());
     }
 
-    public boolean remove(T item){
-        if(item == null){
+    public synchronized boolean remove(T item) {
+        if (item == null) {
             logger.warn(String.format("Attempted to remove null %s", entityType));
             return false;
         }
@@ -156,7 +177,7 @@ public class GenericRepository<T> {
         return removed;
     }
 
-    public boolean removeByIdentity(String identity) {
+    public synchronized boolean removeByIdentity(String identity) {
         if (identity == null) {
             logger.warn(String.format("Attempted to remove %s with null identity", entityType));
             return false;
@@ -186,7 +207,7 @@ public class GenericRepository<T> {
         return findByIdentity(identity).isPresent();
     }
 
-    protected Optional<T> findByIdentity(String identity) {
+    public Optional<T> findByIdentity(String identity) {
         if (identity == null) {
             logger.warn(String.format("Attempted to find %s with null identity", entityType));
             return Optional.empty();
@@ -223,5 +244,5 @@ public class GenericRepository<T> {
         items.clear();
         logger.info(String.format("Cleared repository. Removed %d %s items", sizeBefore, entityType));
     }
-    
+
 }

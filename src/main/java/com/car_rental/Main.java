@@ -1,70 +1,88 @@
 package com.car_rental;
 
-import java.util.List;
-
 import com.car_rental.config.AppConfig;
-import com.car_rental.model.Branch;
-import com.car_rental.model.Car;
-import com.car_rental.model.CarStatus;
-import com.car_rental.model.Customer;
-import com.car_rental.model.Payment;
-import com.car_rental.model.PaymentMethod;
-import com.car_rental.model.Rental;
-import com.car_rental.parser.CarFileParser;
 import com.car_rental.persistence.PersistenceManager;
 import com.car_rental.repository.BranchRepository;
 import com.car_rental.repository.CarRepository;
-import com.car_rental.repository.GenericRepository;
-import com.car_rental.repository.PaymentRepository;
-import com.car_rental.service.ReportGenerator;
+import com.car_rental.repository.CustomerRepository;
+import com.car_rental.repository.RentalRepository;
+import com.car_rental.service.LoadResult;
+import com.car_rental.service.loader.DataLoader;
+import com.car_rental.service.loader.ExecutorLoadingStrategy;
+import com.car_rental.service.loader.ParallelLoadingStrategy;
+import com.car_rental.service.loader.SequentialLoadingStrategy;
 
 public class Main {
     public static void main(String[] args) {
-        
+
         AppConfig appConfig = new AppConfig();
         PersistenceManager persistenceManager = new PersistenceManager(appConfig);
-        CarRepository cars = new CarRepository();
-        cars.add(new Car("CE1234EK", "Toyota Corolla", 2019, 30000, CarStatus.AVAILABLE));
-        cars.add(new Car("AA5678KC", "Ford Focus",   2016, 55000, CarStatus.AVAILABLE));
-        cars.add(new Car("AT9012MK", "Hyundai i30",  2021, 15000, CarStatus.MAINTENANCE));
 
-        persistenceManager.save(cars.getAll(), "cars", Car.class, "JSON");
-        persistenceManager.load("cars", Car.class, "JSON")
-        .stream().forEach(System.out::println);
-        BranchRepository branches = new BranchRepository();
-        branches.add(new Branch("123", "123"));
-        System.out.println(branches.findByLocation("123"));
+        BranchRepository branchRepository = new BranchRepository();
+        CarRepository carRepository = new CarRepository();
+        CustomerRepository customerRepository = new CustomerRepository();
+        RentalRepository rentalRepository = new RentalRepository();
 
-        persistenceManager.save(branches.getAll(), "branches", Branch.class, "JSON");
+        demonstrateDataLoading(persistenceManager, branchRepository, carRepository, customerRepository, rentalRepository);
 
-        GenericRepository<Customer> customerRepository = new GenericRepository<>(Customer::driverLicense, "Customer");
+    }
 
-        List<Customer> customers = persistenceManager.load("customers", Customer.class, "JSON");
+    private static void demonstrateDataLoading(
+            PersistenceManager persistenceManager,
+            BranchRepository branchRepository,
+            CarRepository carRepository,
+            CustomerRepository customerRepository,
+            RentalRepository rentalRepository
+    ) {
+        DataLoader dataLoader = new DataLoader(persistenceManager);
 
-        customerRepository.addAll(customers);
-        customerRepository.add(new Customer("Olena", "Shevchenko", "ХЕН123456", "12.05.1992"));
-        customerRepository.add(new Customer("Nikita", "Kovalenko", "ХНВ123456", "03.11.1988"));
+        LoadResult sequentialResult = dataLoader.load(
+                branchRepository,
+                carRepository,
+                customerRepository,
+                rentalRepository,
+                new SequentialLoadingStrategy()
+        );
+        System.out.println("Sequential Loading Result: " + sequentialResult);
 
-        persistenceManager.saveAllFormats(customerRepository.getAll(), "customers", Customer.class);
+        clearRepositories(branchRepository, carRepository, customerRepository, rentalRepository);
 
-        Rental rent1 = new Rental("0", cars.get(0), customerRepository.get(0), "01.09.2025", "05.09.2025");
-        Rental rent2 = new Rental("1", cars.get(1), customerRepository.get(0)); // default endDate = now+10 days
+        LoadResult parallelResult = dataLoader.load(
+                branchRepository,
+                carRepository,
+                customerRepository,
+                rentalRepository,
+                new ParallelLoadingStrategy()
+        );
 
-        PaymentRepository payments = new PaymentRepository();
-        payments.add(new Payment("1", rent2, 1000, PaymentMethod.CASH));
-        //System.out.println(payments.findByIdentity("1").orElse(null).toString());
+        System.out.println("Parallel Loading Result: " + parallelResult);
 
-        List<Car> fileCars = CarFileParser.parseFromCSV("cars.csv");
-        cars.addAll(fileCars);
+        clearRepositories(branchRepository, carRepository, customerRepository, rentalRepository);
 
-        for(Car car : cars.getAll()) {
-            System.out.println(ReportGenerator.generateCarReport(car));
-        }
-        System.out.println();
+        LoadResult executorResult = dataLoader.load(
+                branchRepository,
+                carRepository,
+                customerRepository,
+                rentalRepository,
+                new ExecutorLoadingStrategy(4)
+        );
 
-        System.out.println(ReportGenerator.generateRentalReport(rent1));
-        System.out.println(ReportGenerator.generateRentalReport(rent2));
-        System.out.println();
+        System.out.println("Executor Loading Result: " + executorResult);
+        System.out.println("\n=== Loading Time Comparison ===");
+        System.out.printf("Sequential:      %d ms%n", sequentialResult.durationMs());
+        System.out.printf("Parallel:        %d ms%n", parallelResult.durationMs());
+        System.out.printf("ExecutorService: %d ms%n", executorResult.durationMs());
+    }
 
+    private static void clearRepositories(
+            BranchRepository branchRepository,
+            CarRepository carRepository,
+            CustomerRepository customerRepository,
+            RentalRepository rentalRepository
+    ) {
+        branchRepository.clear();
+        carRepository.clear();
+        customerRepository.clear();
+        rentalRepository.clear();
     }
 }
